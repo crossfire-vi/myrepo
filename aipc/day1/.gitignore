@@ -1,0 +1,9 @@
+#Terraform sensitive files
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+#igore local tfvars (contains secets)
+terraform.tfvars
+*.tfvars
