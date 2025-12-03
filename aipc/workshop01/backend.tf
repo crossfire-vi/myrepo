@@ -1,5 +1,5 @@
 resource "docker_container" "bgg_backend" {
-    count = var.backend_count
+    count = 3
 
     name = "bgg-backend-${count.index}"
     image = "chukmunnlee/bgg-backend:v3"
@@ -9,7 +9,7 @@ resource "docker_container" "bgg_backend" {
     }
 
     env = [
-        "BGG_DB_USR=ROOT",
+        "BGG_DB_USER=root",
         "BGG_DB_PASSWORD=changeit",
         "BGG_DB_HOST=${docker_container.bgg_database.name}"
     ]

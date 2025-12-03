@@ -16,8 +16,9 @@ terraform {
 }
 
 provider "docker" {
-  # Configuration options
+  host = "ssh://root@${digitalocean_droplet.reverse_proxy.ipv4_address}"
 }
+
 
 provider "local" {
   # Configuration options
