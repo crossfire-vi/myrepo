@@ -20,3 +20,7 @@
         src: /usr/local/share/lang/go/bin/go
         dest: /usr/local/bin/go
         state: link
+    - name: Executing Arbitrary command
+      shell:
+        cmd:  "ip addr > /tmp/ip.txt"
+        creates: /tmp/ip.txt
