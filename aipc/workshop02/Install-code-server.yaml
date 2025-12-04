@@ -2,6 +2,10 @@
   hosts: all
   become: yes
 
+  vars:
+    # Use the actual HOME of the user running code-server (root -> /root, fred -> /home/fred)
+    code_server_config_dir: "{{ ansible_env.HOME }}/.config/code-server"
+    
   tasks:
     - name: Ensure dependencies are installed
       apt:
@@ -18,7 +22,7 @@
 
     - name: Create code-server config directory
       file:
-        path: /home/{{ ansible_user }}/.config/code-server
+        path: "{{ code_server_config_dir }}"
         state: directory
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
@@ -26,7 +30,7 @@
 
     - name: Configure code-server
       copy:
-        dest: /home/{{ansible_user}}/.config/code-server/config.yaml
+        dest: "{{ code_server_config_dir }}/config.yaml"
         content: |
           bind-addr: 0.0.0.0:{{code_server_port}}
           auth: password
@@ -49,3 +53,9 @@
         name: code-server@{{ansible_user}}
         state: restarted
       become: yes
+
+    - name: link go to /usr/local/bin/code-server, /usr/local/share/code-server
+      file: 
+        src: /usr/bin/code-server
+        dest: /usr/local/bin/code-server
+        state: link
