@@ -1,0 +1,51 @@
+- name: Install Code Server
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Ensure dependencies are installed
+      apt:
+        name:
+          - curl
+          - wget
+        update_cache: yes
+
+    - name: Download code-server install script
+      shell: |
+        curl -fsSL https://code-server.dev/install.sh | sh
+      args:
+        creates: /usr/bin/code-server
+
+    - name: Create code-server config directory
+      file:
+        path: /home/{{ ansible_user }}/.config/code-server
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Configure code-server
+      copy:
+        dest: /home/{{ansible_user}}/.config/code-server/config.yaml
+        content: |
+          bind-addr: 0.0.0.0:{{code_server_port}}
+          auth: password
+          password: {{code_server_pass}}
+          cert: false
+        owner: "{{ansible_user}}"
+        group: "{{ansible_user}}"
+        mode: '0600'
+
+    - name: Enable and start code-server service
+      systemd:
+        name: code-server@{{ansible_user}}
+        enabled: yes
+        state: started
+      become: yes
+
+    - name: Reload and restart nginx service
+      systemd:
+        daemon_reload: yes
+        name: code-server@{{ansible_user}}
+        state: restarted
+      become: yes
