@@ -1,0 +1,41 @@
+- name: Install and configure NGINX for code-server
+  hosts: all
+  become: yes
+
+  vars:
+    droplet_ip: "{{ ansible_host }}"
+    code_server_port: 8080
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Copy code-server.conf to nginx sites-available
+      copy:
+        src: ./code-server.conf
+        dest: /etc/nginx/sites-available/code-server.conf
+        owner: root
+        group: root
+        mode: '0644'
+      become: yes
+
+    - name: Enable NGINX site
+      file:
+        src: /etc/nginx/sites-available/code-server.conf
+        dest: /etc/nginx/sites-enabled/code-server.conf
+        state: link
+        force: yes
+
+    - name: Remove default NGINX site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Restart NGINX
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
