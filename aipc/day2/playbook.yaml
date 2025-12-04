@@ -1,0 +1,42 @@
+- name: Playbook 101
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Check connectivity
+      ansible.builtin.ping:
+
+    - name: Find log files larger than 1k and older than 1 day
+      ansible.builtin.find:
+        paths: /var/log
+        patterns:
+          - "*.log.gz"
+          - "*.log"
+        size: "1k"
+        age: "1d"
+      register: found_logs
+
+    - name: Show found logs
+      debug:
+        var: found_logs.files
+
+    - name: Ensure nginx is installed
+      ansible.builtin.package:
+        name: nginx
+        state: present
+      become: yes
+
+    - name: Enable and start nginx
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: yes
+        state: started
+      become: yes
+
+    - name: Reload and restart nginx service
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        name: nginx
+        state: restarted
+      become: yes

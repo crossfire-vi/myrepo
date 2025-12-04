@@ -1,0 +1,10 @@
+all:
+  vars:
+    ansible_user: fred
+    ansible_ssh_private_key_file: "~/.ssh/id_ed25519"
+    ansible_connection: ssh
+    ansible_python_interpreter: /usr/bin/python3
+
+  hosts:
+    server-0:
+      ansible_host: 47.129.248.39  # or better: the PUBLIC IP if you're not in same VPC

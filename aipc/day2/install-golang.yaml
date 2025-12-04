@@ -1,0 +1,22 @@
+- name: Install Golang
+  become: yes          # <– run all tasks with sudo
+  become_method: sudo  # optional, default
+  hosts: all
+  tasks:
+    - name: Check connectivity
+      ping:
+    - name: Create Directory
+      file:
+        path: /usr/local/share/lang
+        state: directory
+        mode: '1777'
+    - name: Download an unarchive
+      unarchive:
+        src: https://go.dev/dl/go1.25.5.linux-amd64.tar.gz
+        dest: /usr/local/share/lang
+        remote_src: yes
+    - name: link go to /usr/local/bin, /usr/local/share/lang/bin/go
+      file:
+        src: /usr/local/share/lang/go/bin/go
+        dest: /usr/local/bin/go
+        state: link
