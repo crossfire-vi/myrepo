@@ -1,0 +1,15 @@
+- name: Install
+  hosts: default
+  tasks:
+    - name: Install packages
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+      register: result
+      #until: result.stderr == "" or result.stderr is not defined
+      until: result is succeeded
+      #until: result.rc == 0
+      retries: 10
+      delay: 10
+

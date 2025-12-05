@@ -1,18 +1,13 @@
-# Terraform state files (safe)
+#Terraform sensitive files
 *.tfstate
 *.tfstate.backup
 .terraform/
 .terraform.lock.hcl
+*.pkrvars*
 
-# Local sensitive tfvars
+#igore local tfvars (contains secets)
 terraform.tfvars
-*.auto.tfvars
-*.local.tfvars
-secrets.tfvars
-
-# Packer sensitive local vars
-*.local.pkrvars.hcl
-
-# Backend config containing credentials
+*.tfvars
 s3_backend.hcl
-backend.hcl
+variables.pkrvars.*
+aipc/day3/create/variables.pkrvars.hcl
