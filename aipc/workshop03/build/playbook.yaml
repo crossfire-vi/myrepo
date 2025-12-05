@@ -1,0 +1,82 @@
+- name: Install
+  hosts: default
+  become: yes
+
+  vars:
+      # Use the actual HOME of the user running code-server (root -> /root, fred -> /home/fred)
+      code_server_config_dir: "{{ ansible_env.HOME }}/.config/code-server"
+      droplet_ip: "{{ ansible_host }}"
+      code_server_port: 8080
+      code_server_user: "root" 
+      code_server_pass: "aipcworkshop2024"
+  tasks:
+      - name: Install nginx
+        apt:
+          name: nginx
+          state: present
+          update_cache: yes
+      - name: Copy code-server.conf to nginx sites-available
+        copy:
+          src: ./code-server.conf
+          dest: /etc/nginx/sites-available/code-server.conf
+          owner: root
+          group: root
+          mode: '0644'
+        become: yes
+      - name: Enable NGINX site
+        file:
+          src: /etc/nginx/sites-available/code-server.conf
+          dest: /etc/nginx/sites-enabled/code-server.conf
+          state: link
+          force: yes
+      - name: Remove default NGINX site
+        file:
+          path: /etc/nginx/sites-enabled/default
+          state: absent
+
+      - name: Ensure dependencies are installed
+        apt:
+          name:
+            - curl
+            - wget
+          update_cache: yes
+
+      - name: Download code-server install script
+        shell: |
+          curl -fsSL https://code-server.dev/install.sh | sh
+        args:
+          creates: /usr/bin/code-server
+
+      - name: Create code-server config directory
+        file:
+          path: "{{ code_server_config_dir }}"
+          state: directory
+          owner: "{{ code_server_user }}"
+          group: "{{ code_server_user }}"
+          mode: '0755'
+
+      - name: Configure code-server
+        copy:
+            dest: "{{ code_server_config_dir }}/config.yaml"
+            content: |
+              bind-addr: 0.0.0.0:{{ code_server_port }}
+              auth: password
+              password: {{ code_server_pass }}
+              cert: false
+            owner: "{{ code_server_user }}"
+            group: "{{ code_server_user }}"
+            mode: '0600'
+
+      - name: Enable and start code-server service
+        systemd:
+            name: "code-server@{{ code_server_user }}"
+            enabled: yes
+            state: started
+        become: yes
+
+      - name: link go to /usr/local/bin/code-server, /usr/local/share/code-server
+        file: 
+          src: /usr/bin/code-server
+          dest: /usr/local/bin/code-server
+          state: link          
+
