@@ -1,0 +1,18 @@
+# Terraform state files (safe)
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Local sensitive tfvars
+terraform.tfvars
+*.auto.tfvars
+*.local.tfvars
+secrets.tfvars
+
+# Packer sensitive local vars
+*.local.pkrvars.hcl
+
+# Backend config containing credentials
+s3_backend.hcl
+backend.hcl
