@@ -1,0 +1,13 @@
+#Terraform sensitive files
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+*.pkrvars*
+
+#igore local tfvars (contains secets)
+terraform.tfvars
+*.tfvars
+s3_backend.hcl
+variables.pkrvars.*
+aipc/day3/create/variables.pkrvars.hcl
